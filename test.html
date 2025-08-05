@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Follow Us & Submit Details</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -86,7 +87,6 @@
         return;
       }
   
-      // Disable the button to prevent multiple submissions
       followBtn.disabled = true;
       followBtn.textContent = "Submitting...";
   
@@ -101,17 +101,34 @@
         },
         body: formData.toString()
       })
-      .finally(() => {
-        // Redirect regardless of success or failure
+      .then(() => {
+        // Open Instagram in a new tab
         window.open("https://www.instagram.com/hamplee.gifting", "_blank");
-        // Optionally reset the form
-        form.reset();
-        // Re-enable the button (optional, if you keep the form)
+  
+        // Replace form with success message
+        form.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px;">
+            <h2>🎉 Thank You!</h2>
+            <p>Thanks for following us & participating in the Lucky Draw.</p>
+          </div>
+        `;
+  
+        // Launch confetti for fun
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      })
+      .catch(error => {
+        console.error("Error!", error.message);
+        alert("Something went wrong. Please try again.");
         followBtn.disabled = false;
         followBtn.textContent = "Follow Us on Instagram";
       });
     });
   </script>
+  
   
 </body>
 </html>
