@@ -52,26 +52,6 @@
       border-radius: 6px;
       cursor: pointer;
     }
-
-    .checkbox-wrapper {
-      margin: 16px 0;
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .submit-btn:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
-    }
   </style>
 </head>
 <body>
@@ -86,74 +66,52 @@
     <input type="text" id="contact" name="contact" required placeholder="e.g., +91 9876543210 or email@example.com" />
 
     <div class="follow-section">
-      <a
-        href="https://www.instagram.com/hamplee.gifting"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="follow-btn"
-      >
+      <button type="button" id="followBtn" class="follow-btn">
         Follow Us on Instagram
-      </a>
+      </button>
     </div>
-
-    <div class="checkbox-wrapper">
-      <label for="followCheckbox">
-        <input type="checkbox" id="followCheckbox" />
-        I have followed the Instagram page
-      </label>
-    </div>
-
-    <button id="submitBtn" class="submit-btn" type="submit" disabled>Submit</button>
   </form>
 
   <script>
     const form = document.getElementById('userForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const checkbox = document.getElementById('followCheckbox');
-    const inputs = form.querySelectorAll('input[required]');
+    const followBtn = document.getElementById('followBtn');
     const scriptURL = "https://script.google.com/macros/s/AKfycbyeQLC4-A85U9YFrvYQH_jSAdAMqyDapEQJyGChJ_9bIjqy_TxPIaAuBOUH6FUpiwIYnQ/exec";
-
-    function validateForm() {
-      let allFilled = true;
-      inputs.forEach(input => {
-        if (!input.value.trim()) allFilled = false;
-      });
-
-      submitBtn.disabled = !(allFilled && checkbox.checked);
-    }
-
-    form.addEventListener('input', validateForm);
-    checkbox.addEventListener('change', validateForm);
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-
+  
+    followBtn.addEventListener('click', function () {
       const villa = document.getElementById('villa').value.trim();
       const contact = document.getElementById('contact').value.trim();
-
-      const formData = new FormData();
+  
+      if (!villa || !contact) {
+        alert("Please fill in both Villa Number and Contact.");
+        return;
+      }
+  
+      // Disable the button to prevent multiple submissions
+      followBtn.disabled = true;
+      followBtn.textContent = "Submitting...";
+  
+      const formData = new URLSearchParams();
       formData.append('address', villa);
       formData.append('contact', contact);
-
+  
       fetch(scriptURL, {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
       })
-      .then(response => {
-        if (response.ok) {
-          alert("Thank you! Your details have been recorded.");
-          form.reset();
-          submitBtn.disabled = true;
-          window.open("https://www.instagram.com/hamplee.gifting", "_blank");
-        } else {
-          alert("Submission failed. Please try again.");
-        }
-      })
-      .catch(error => {
-        console.error("Error!", error.message);
-        alert("Error submitting form. Please check your internet or try again.");
+      .finally(() => {
+        // Redirect regardless of success or failure
+        window.open("https://www.instagram.com/hamplee.gifting", "_blank");
+        // Optionally reset the form
+        form.reset();
+        // Re-enable the button (optional, if you keep the form)
+        followBtn.disabled = false;
+        followBtn.textContent = "Follow Us on Instagram";
       });
     });
   </script>
+  
 </body>
 </html>
