@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Follow Us & Submit Details</title>
   <style>
     body {
@@ -80,10 +80,10 @@
 
   <form id="userForm">
     <label for="villa">Villa Number:</label>
-    <input type="text" id="villa" required placeholder="e.g., Villa 12B" />
+    <input type="text" id="villa" name="address" required placeholder="e.g., Villa 12B" />
 
     <label for="contact">Contact (Phone or Email):</label>
-    <input type="text" id="contact" required placeholder="e.g., +91 9876543210 or email@example.com" />
+    <input type="text" id="contact" name="contact" required placeholder="e.g., +91 9876543210 or email@example.com" />
 
     <div class="follow-section">
       <a
@@ -111,6 +111,7 @@
     const submitBtn = document.getElementById('submitBtn');
     const checkbox = document.getElementById('followCheckbox');
     const inputs = form.querySelectorAll('input[required]');
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyeQLC4-A85U9YFrvYQH_jSAdAMqyDapEQJyGChJ_9bIjqy_TxPIaAuBOUH6FUpiwIYnQ/exec";
 
     function validateForm() {
       let allFilled = true;
@@ -126,12 +127,32 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+
       const villa = document.getElementById('villa').value.trim();
       const contact = document.getElementById('contact').value.trim();
 
-      alert("Thank you! Your details have been recorded.\n\nVilla: " + villa + "\nContact: " + contact);
+      const formData = new FormData();
+      formData.append('address', villa);
+      formData.append('contact', contact);
 
-      // TODO: Send data to backend, Google Sheets, etc.
+      fetch(scriptURL, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (response.ok) {
+          alert("Thank you! Your details have been recorded.");
+          form.reset();
+          submitBtn.disabled = true;
+          window.open("https://www.instagram.com/hamplee.gifting", "_blank");
+        } else {
+          alert("Submission failed. Please try again.");
+        }
+      })
+      .catch(error => {
+        console.error("Error!", error.message);
+        alert("Error submitting form. Please check your internet or try again.");
+      });
     });
   </script>
 </body>
